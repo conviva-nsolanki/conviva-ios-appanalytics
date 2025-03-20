@@ -1,215 +1,307 @@
-# conviva-ios-appanalytics
-Use Application Analytics to autocollect events and track application specific events and state changes.
+# Conviva iOS ECO SDK
 
-# Supported Platforms
+Use Conviva iOS ECO SDK to auto-collect events and track application-specific events and state changes.
+
+**Table of Contents**
+- [Quick Start](#quick-start)
+- [More Features](#more-features)
+- [Auto-collected Events](#auto-collected-events)
+- [FAQ](#faq)
+
+## Quick Start
+
+##### Supported Platforms
+
 * iOS(9.0 and above)
 * iPadOS(13.0 and above)
 * tvOS(9.0 and above)
 * watchOS(TBD)
 
-# Configuring Workspace
-* SPM
-   * https://github.com/conviva/conviva-ios-appanalytics
-* Cocoapods
-   * Add below line in pods file
-     * pod 'ConvivaAppAnalytics', '1.0.3'
+<details>
+<summary><b>Diagram</b></summary>
 
- **NOTE: During pod installation, if you are facing any issues with FMDB, Please update your file as below and do pod installation.**
-   * Add below line in pods file
-     * pod 'ConvivaAppAnalytics', '1.0.3'
+  ```mermaid
+    graph TD
+    app[iOS Application];
+    sdk[Conviva ECO SDK];
+    backend[Conviva Backend];
+    app --> |App Actions| sdk;
+    sdk --> backend;
+    sdk --> |Swizzling| app;
 
-* Manual Download
-  * Download and unzip the package from Downloads. During the build phase, add ConvivaAppAnalytics.xcframework to Link Binary with Libraries section 
-  in  xcode. This package contains the frameworks for both, iOS and tvOS.
+    style sdk fill:#004AAD,color:#FFFFFF
+    style backend fill:#004AAD,color:#FFFFFF
+  ```
 
-* Link the following system frameworks to Link Binary with Libraries section in xcode:
+</details>
+  
 
-  * UIKit
-  * Foundation
-  * CoreTelephony (iOS only)
-  * In Other Linker Flags section in Xcode, add "-ObjC".
-  * To refer to the Conviva classes from your source code, add the following import statements:
+### 1. Installation
+- Install the Conviva iOS ECO SDK using one of the following methods:
+  
+    - [Swift Package Manager](#swift-package-manager)
+    - [CocoaPods](#cocoapods)
+    - [Manual Install](#manual-install)
+
+- After Installation, add link required frameworks and linker flag:
+    -  Go to **Build Phases** &#8594; **Link Binary With Libraries** and add the following system frameworks:
+        -  `UIKit`
+        -  `Foundation`
+        -  `CoreTelephony` (iOS only)
+    - In **Other Linker Flags** add `-ObjC`.
+      
+- Import the Conviva SDK into your source code:
 
 ```swift
-* Swift:
+// Swift:
 import ConvivaAppAnalytics
 ```
 
-```objective-c
-* ObjC:
+```Objective-C
+// ObjC:
 @import ConvivaAppAnalytics;
 
 ```
 
-# Initialize Conviva Tracker
+#### Swift Package Manager
 
-It is recommended to initialize the Conviva Tracker at the earliest possible stage in the application's launch lifecycle. Ideally, this should be done in the app's entry point method, before any other application functionalities are executed.
-
-```swift
-func application(
-    _ application: UIApplication,
-    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
-) -> Bool
+Repository:
+`https://github.com/conviva/conviva-ios-appanalytics`
+    
+#### CocoaPods
+Add the following line to your `Podfile`, replacing `<version>` with the latest SDK version available [here](https://github.com/Conviva/conviva-ios-appanalytics/releases):
+```plaintext
+pod 'ConvivaAppAnalytics', '<version>'
 ```
 
-```swift
-// Initialization
-* Swift:
-let tracker = CATAppAnalytics.createTracker(customerKey: customerKey, appName: appName)
+#### Manual Install
+- Download the package from [releases](https://github.com/Conviva/conviva-ios-appanalytics/releases).
+- In Xcode, go to **Build Phases** and add `ConvivaAppAnalytics.xcframework` to the **Link Binary with Libraries** section. This package contains frameworks for both iOS and tvOS.
 
-// The tracker object can be fetched using the following API in the other classes than the place where createTracker is invoked using following API:
+### 2. Initialization
+
+#### Note: It is recommended to initialize the tracker at the earliest possible stage of the application's launch lifecycle. Ideally, this should be done in the app's entry point method, before any other application functionality is executed.
+
+Some examples of Conviva iOS ECO SDK initialization:
+```swift
+// Swift:
+import ConvivaAppAnalytics
+
+@UIApplicationMain
+class AppDelegate: UIResponder, UIApplicationDelegate {
+    
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
+    ) -> Bool {
+        // Initialize Conviva Tracker
+        let tracker = CATAppAnalytics.createTracker(customerKey: customerKey, appName: appName)
+
+        return true
+    }
+```
+
+```objective-c
+// ObjC:
+@import ConvivaAppAnalytics;
+
+@implementation AppDelegate
+
+- (BOOL)application:(UIApplication *)application 
+    didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+
+    // Initialize Conviva Tracker
+    id<CATTrackerController> tracker = [CATAppAnalytics createTrackerWithCustomerKey:customerKey appName:appName];
+
+    return YES;
+}
+```
+**customerKey** - A string to identify a specific customer account. Use different keys for dev and prod. Find them in [Pulse](https://pulse.conviva.com/app/profile/applications) under My Profile(_Conviva login required_).
+
+**appName** -  A string value that uniquely identifies your app across platforms.
+
+The tracker object can be retrieved using the following API in other classes after initialization.
+
+```swift
+// Swift:
 let tracker = CATAppAnalytics.defaultTracker();
 ```
 
 ```objective-c
-// Initialization
-* ObjC:
-id<CATTrackerController> tracker = [CATAppAnalytics createTrackerWithCustomerKey:customerKey appName:appName];
-
-// The tracker object can be fetched using the following API in the other classes than the place where createTracker is invoked using following API:
+// ObjC:
 id<CATTrackerController> tracker = [CATAppAnalytics defaultTracker];
 ```
 
-<strong>customerKey</strong> - a string to identify specific customer account. Different keys shall be used for development / debug versus production environment. Find your keys on the account info page in Pulse.
+### 3. Set the User ID
+User ID is a unique string identifier to distinguish individual viewers. If using [Conviva Video Sensor](https://github.com/Conviva/ConvivaSDK), match it with the **Viewer ID**.
 
-<strong>appName</strong> - a string value used to distinguish your applications. Simple values that are unique across all of your integrated platforms work best here.
-
-# Set the user id (viewer id)
 ```swift
-* Swift:
+// Swift:
 tracker?.subject?.userId = "user_id"
 ```
 
 ```objective-c
-* ObjC:
+// ObjC:
 tracker.subject.userId = @"user_id";
 ```
-# Custom event tracking to track your application specific events and state changes
-Use trackCustomEvent(name:data:) to track all kinds of events. This API provides 2 fields to describe the tracked events. 
-  * eventName  - Name of the custom event.
-  * data  – Any type of data in string format.
 
-The following example shows the implementation of the trackCustomEvent.
+After steps 1–3, verify [auto-collected events](#auto-collected-events) in the [validation dashboard](https://pulse.conviva.com/app/appmanager/ecoIntegration/validation). (_Conviva login required_)
 
-```swift
-* Swift:
-let data = "{\"identifier1\": \"test\",\"identifier2\": 1,\"identifier3\":true}"
-tracker?.trackCustomEvent("your-event-name", data: data)
-```
+## More Features
+
+<details>
+
+<summary><b>Track Custom Event</b></summary>
+
+Two APIs to track custom events:
 
 ```objective-c
-* ObjC:
-NSString *data = @"{\"identifier1\": \"test\",\"identifier2\": 1,\"identifier3\":true}";
-[tracker trackCustomEvent:@"your-event-name" data:data];
+/**
+ * Track custom event.
+ * @param name Name of the custom event.
+ * @param data A JSON-formatted string.
+ */
+- (void)trackCustomEvent:(NSString *)name data:(nonnull NSString*)data;
+
+/**
+ * Track custom event.
+ * @param name Name of the custom event.
+ * @param eventData Dictionary/Array of dictionaries.
+ */
+- (void)trackCustomEvent:(NSString *)name eventData:(nonnull id)eventData;
 ```
 
-Use trackCustomEvent(name:eventData) to track all kinds of events. This API provides 2 fields to describe the tracked events. 
-  * eventName  - Name of the custom event.
-  * eventData  – Dictionary/Array of dictionaries
-
-The following example shows the implementation of the trackCustomEvent.
+Examples: 
 
 ```swift
-* Swift:
+// Swift:
 var eventData = ["identifier1":"test","identifier2":1,"identifier3":true] as [String : Any]
 tracker?.trackCustomEvent("your-event-name", eventData: eventData)
 ```
 
 ```objective-c
-* ObjC:
+// ObjC:
 NSDictionary *data = @{@"identifier1":@"test",@"identifier2":@(1),@"identifier3":@(true)};
 [self trackCustomEvent:@"your-event-name" eventData:data];
 ```
 
-# Screen view tracking
-When user navigates between screens, user journey is tracked by reading the class names of UIViewController classes. Name of the screens can be customized using below code as per the bussiness needs.
+</details>
 
+<details>
+
+<summary><b>Set Custom Tags</b></summary>
+
+Custom Tags are global tags applied to all events and persist throughout the application lifespan, or until they are cleared.
+
+Set the custom tags: 
 ```swift
-* Swift:
-* //Add below property in view controller
-* @objc var catViewId:String = "App Analytics View"
+// Swift:
+// Adds the custom tags
+let tags = ["Key1": "Value1", "Key2": "Value2"]
+tracker?.setCustomTags(tags)
 ```
-```objective-c
-* ObjC:
-* //Declare property like below
-* @property(copy, nonatomic)NSString *catViewId;
-* //Add below line in viewDidLoad method
-* self.catViewId = @"Customizable name";
-```
-# Custom Tags Support
-Support is added to pass custom data as key-val pairs which are available in each event triggered by sdk and passed to backend. Below are the new api additions to support Custom Tags.
 
 ```objective-c
-* ObjC:
-// Setter API
-
-/**
- * Set custom tags.
- * Pass custom tags
- * @param tags Dictionary of Key-Val pairs.
- */
-- (void)setCustomTags:(NSDictionary *)tags;
-
-//Usage
+// ObjC:
+// Adds the custom tags
 NSDictionary* tags = @{
     @"Key1": @"Value1",
     @"Key2": @"Value2",
 };
 [tracker setCustomTags:tags];
-
-// Clear API
-/**
- * Clears all custom tags.
- */
-- (void)clearCustomTags;
-
-//Usage
-[tracker clearCustomTags];
-
-/**
- * Clears custom tags which are matching keys as passed in.
- * Keys of tags to be cleared
- * @param tagKeys tagKeys.
- */
-- (void)clearCustomTags:(NSArray *)tagKeys;
-
-//Usage
-NSArray* keys = @[ @"Key1", @"Key2", @"Key3" ];
-[tracker clearCustomTags:keys];
-
 ```
+
+Clear a few of the previously set custom tags:
 ```swift
-* Swift:
-//Usage: Set custom tags
-let tags = ["Key1": "Value1", "Key2": "Value2"]
-tracker?.setCustomTags(tags)
-
-//Usage: Clear all custom tags
-tracker?.clearCustomTags()
-
-//Usage: Clear custom tags
+// Swift:
+// Clears custom tags Key1, Key2 & Key3
 let keys = ["Key1", "Key2", "Key3"]
 tracker?.clearCustomTags(keys)
 ```
 
-<details>
-  <summary><b>Auto-collected Events</b></summary>
+```objective-c
+// ObjC:
+// Clears custom tags Key1, Key2 & Key3
+NSArray* keys = @[ @"Key1", @"Key2", @"Key3" ];
+[tracker clearCustomTags:keys];
+```
 
-##### Conviva provides a rich set of application performance metrics with the help of autocollected app events, such as _screen_view_ , _button_click_, and _network_request_.
+Clear all the previously set custom tags:
+```swift
+// Swift:
+// Clears all the custom tags
+tracker?.clearAllCustomTags()
+```
+
+```objective-c
+// ObjC:
+// Clears all the custom tags
+[tracker clearAllCustomTags];
+```
+
+</details>
+
+<details>
+
+<summary><b>Override UIViewController Class Name</b></summary>
+
+By default, user navigation is tracked using the class names of `UIViewController` instances. 
+Override the screen name using the following API:
+
+```swift
+// Swift:
+class ExampleViewController: UIViewController {
+
+    // Add below property in view controller
+    @objc var catViewId: String = "Home Screen View"
+
+```
+```objective-c
+// ObjC:
+// CustomViewController.h
+@interface ExampleViewController : UIViewController
+    // Declare property like 
+    @property(copy, nonatomic)NSString *catViewId;
+
+
+// CustomViewController.m
+#import "ExampleViewController.h"
+
+@implementation ExampleViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    self.catViewId = @"Home Screen View";
+    // ...
+}
+```
+
+</details>
+
+## Auto-collected Events
+
+Conviva automatically collects rich set of app performance metrics through app events after completing the [Quick Start](#quick-start).
+
+<details>
+  <summary><b>Auto-collected events table</b></summary>
+
+  nan comment: network request & response body restriction, content type not mentioned. 
 
 Event | Occurrence |
 ------|-------------|
-network_request | after receiving the network request response|
-screen_view | when the screen is interacted on either first launch or relaunch|
-application_error | when an error occurrs in the application|
-button_click | on the button click callback|
-application_background | when the application is taken to the background|
-application_foreground | when the application is taken to the foreground|
-application_install |when the application is launched for the first time after it's installed. (It's not the exact installed time.)|
+network_request | After receiving the network request response. |
+screen_view | When the screen is interacted on either first launch or relaunch. |
+application_error | When an error occurrs in the application. |
+button_click | On the button click callback. |
+application_background | When the application is taken to the background. |
+application_foreground | When the application is taken to the foreground. |
+application_install | When the application is launched for the first time after it's installed. (It's not the exact installed time.) |
 
-To learn about the default metrics for analyzing the native and web applications performance, such as App Crashes, Avg Screen Load Time, and Page Loads, refer to the [App Experience Metrics](https://pulse.conviva.com/learning-center/content/app_experience/app_experience_metrics.html?tocpath=App%20Experience%7C_____8) page in the Learning Center.
+To learn about the default metrics for analyzing the native and web applications performance, such as App Crashes, Avg Screen Load Time, and Page Loads, refer to the [App Experience Metrics](https://pulse.conviva.com/learning-center/content/eco/eco_metrics.html) page in the Learning Center.
+
 </details>
 
-#### Note: If user of this sdk also uses ConvivaSDK for Experience Insights/Ad Insights, ConvivaSDK version must be 4.0.28 or above to be compatable with ConvivaAppAnalytics version 0.2.3 or above
-#### To enable automatic collection of playback events, ConvivaSDK 4.0.32 or above must be used.
- 
+## FAQ
+
+[ECO Integration FAQ](https://pulse.conviva.com/learning-center/content/sensor_developer_center/tools/eco_integration/eco_integration_faq.htm)
