@@ -20,18 +20,26 @@ Use Conviva iOS ECO SDK to auto-collect events and track application-specific ev
 <details>
 <summary><b>Diagram</b></summary>
 
-  ```mermaid
-    graph TD
-    app[iOS Application];
-    sdk[Conviva ECO SDK];
-    backend[Conviva Backend];
-    app --> |App Actions| sdk;
-    sdk --> backend;
-    sdk --> |Swizzling| app;
+```mermaid
+   graph LR
+        %% Lifecycle Phase
+    subgraph "iOS Application Lifecycle"
+        app[UI Layer & Business Logic] --> sdk[Conviva ECO SDK]
+        app --> events[App Events]
+        events --> sdk
+    end
+    sdk -.-> backend[Conviva Backend]
 
+    %% Startup Phase
+    subgraph "iOS Application Startup"
+        sdk_startup[Conviva ECO SDK] -->|Swizzling| app_startup[UI Layer & Business Logic]
+    end
+
+    %% Styling
     style sdk fill:#004AAD,color:#FFFFFF
     style backend fill:#004AAD,color:#FFFFFF
-  ```
+    style sdk_startup fill:#004AAD,color:#FFFFFF
+```
 
 </details>
   
