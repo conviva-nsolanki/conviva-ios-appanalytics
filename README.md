@@ -51,7 +51,7 @@ Use Conviva iOS ECO SDK to auto-collect events and track application-specific ev
     - [CocoaPods](#cocoapods)
     - [Manual Install](#manual-install)
 
-- After Installation, add link required frameworks and linker flag:
+- After Installation, add required frameworks and linker flags:
     -  Go to **Build Phases** &#8594; **Link Binary With Libraries** and add the following system frameworks:
         -  `UIKit`
         -  `Foundation`
