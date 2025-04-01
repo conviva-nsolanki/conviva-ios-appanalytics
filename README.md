@@ -51,7 +51,7 @@ Use Conviva iOS ECO SDK to auto-collect events and track application-specific ev
     - [CocoaPods](#cocoapods)
     - [Manual Install](#manual-install)
 
-- After Installation, add required frameworks and linker flags:
+- Only for [Swift Package Manager](#swift-package-manager) and [Manual Install](#manual-install), add required frameworks and linker flags:
     -  Go to **Build Phases** &#8594; **Link Binary With Libraries** and add the following system frameworks:
         -  `UIKit`
         -  `Foundation`
@@ -77,14 +77,14 @@ Repository:
 `https://github.com/conviva/conviva-ios-appanalytics`
     
 #### CocoaPods
-Add the following line to your `Podfile`, replacing `<version>` with the latest SDK version available [here](https://github.com/Conviva/conviva-ios-appanalytics/releases):
+Add the following line to your `Podfile`:
 ```plaintext
-pod 'ConvivaAppAnalytics', '<version>'
+pod 'ConvivaAppAnalytics', '1.0.3'
 ```
 
 #### Manual Install
 - Download the package from [releases](https://github.com/Conviva/conviva-ios-appanalytics/releases).
-- In Xcode, go to **Build Phases** and add `ConvivaAppAnalytics.xcframework` to the **Link Binary with Libraries** section. This package contains frameworks for both iOS and tvOS.
+- In Xcode, go to **Build Phases** and add `ConvivaAppAnalytics.xcframework` to the **Link Binary with Libraries** section. This package contains frameworks for iOS, iPadOS and tvOS.
 
 ### 2. Initialization
 
@@ -287,6 +287,13 @@ class ExampleViewController: UIViewController {
 
 </details>
 
+<details>
+
+   <summary><b>SwiftUI Support</b></summary>
+   
+   
+</details>
+
 ## Auto-collected Events
 
 Conviva automatically collects rich set of app performance metrics through app events after completing the [Quick Start](#quick-start).
@@ -294,20 +301,48 @@ Conviva automatically collects rich set of app performance metrics through app e
 <details>
   <summary><b>Auto-collected events table</b></summary>
 
-  nan comment: network request & response body restriction, content type not mentioned. 
 
 Event | Occurrence |
 ------|-------------|
-network_request | After receiving the network request response. |
-screen_view | When the screen is interacted on either first launch or relaunch. |
+network_request | After receiving the network request response. [Refer limitations](#limitations).|
+screen_view | When the screen is interacted on either first launch or relaunch. [Refer limitations](#limitations).|
 application_error | When an error occurrs in the application. |
-button_click | On the button click callback. |
+button_click | On the button click callback. [Refer limitations](#limitations).|
 application_background | When the application is taken to the background. |
 application_foreground | When the application is taken to the foreground. |
 application_install | When the application is launched for the first time after it's installed. (It's not the exact installed time.) |
 
 To learn about the default metrics for analyzing the native and web applications performance, such as App Crashes, Avg Screen Load Time, and Page Loads, refer to the [App Experience Metrics](https://pulse.conviva.com/learning-center/content/eco/eco_metrics.html) page in the Learning Center.
 
+</details>
+
+### Limitations
+<details>
+   
+   <summary><b>network_request</b></summary>
+   
+   This feature supports `URLSession`, `NSURLConnection`, and third-party network libraries built on top of `URLSession` or `NSURLConnection`.
+
+  **Request and Response Body Collection:**
+
+  Collected only when:
+  - Size is < 10KB and content-length is available.
+  - Content-type is `"json"` or `"text/plain"`.
+  - Data is a `NSDictionary`, nested `NSDictionary`, or `NSArray`.
+
+ **Request and Response Header Collection:**
+
+ Collected only when:
+ - Data is a `NSDictionary` (Nested `NSDictionary` and `NSArray` are not yet supported).
+      
+</details>
+
+<details>
+
+   <summary><b>screen_view, button_click</b></summary>
+   
+   Auto-collection of `screen_view` and `button_click` is not supported for SwiftUI. To report `screen_view` and `button_click` in SwiftUI, please refer to [SwiftUI Support](#swiftui-support).
+   
 </details>
 
 ## FAQ
