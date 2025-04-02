@@ -321,7 +321,7 @@ To learn about the default metrics for analyzing the native and web applications
    
    <summary><b>network_request</b></summary>
    
-   This feature supports `URLSession`, `NSURLConnection`, and third-party network libraries built on top of `URLSession` or `NSURLConnection`.
+   This feature supports `NSURLSession`, `NSURLConnection`, and third-party network libraries built on top of `NSURLSession` or `NSURLConnection`.
 
   **Request and Response Body Collection:**
 
