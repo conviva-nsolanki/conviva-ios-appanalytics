@@ -21,24 +21,27 @@ Use Conviva iOS ECO SDK to auto-collect events and track application-specific ev
 <summary><b>Diagram</b></summary>
 
 ```mermaid
-   graph LR
-        %% Lifecycle Phase
-    subgraph "iOS Application Lifecycle"
-        app[UI Layer & Business Logic] --> sdk[Conviva ECO SDK]
-        app --> events[App Events]
-        events --> sdk
-    end
-    sdk -.-> backend[Conviva Backend]
+   graph TB
 
-    %% Startup Phase
-    subgraph "iOS Application Startup"
-        sdk_startup[Conviva ECO SDK] -->|Swizzling| app_startup[UI Layer & Business Logic]
-    end
-
-    %% Styling
-    style sdk fill:#004AAD,color:#FFFFFF
-    style backend fill:#004AAD,color:#FFFFFF
-    style sdk_startup fill:#004AAD,color:#FFFFFF
+     %% Lifecycle Phase (right)
+     subgraph B[iOS Application Lifecycle]
+       direction TB
+       app[Instrumented UI Layer & Business Logic]
+       app --> sdk[Conviva ECO SDK]
+     end
+      sdk -.-> backend[Conviva Backend]
+   
+     %% Startup Phase (left)
+     subgraph A[iOS Application Startup]
+       direction TB
+       sdk_startup[Conviva ECO SDK] --> app_startup[UI Layer & Business Logic]
+       app_startup --> |Swizzling| swizzled[Instrumented UI Layer & Business Logic]
+     end
+   
+     %% Styling
+     style sdk fill:#004AAD,color:#FFFFFF
+     style sdk_startup fill:#004AAD,color:#FFFFFF
+     style backend color:#FFFFFF,fill:#004AAD
 ```
 
 </details>
@@ -52,7 +55,7 @@ Use Conviva iOS ECO SDK to auto-collect events and track application-specific ev
     - [Manual Install](#manual-install)
 
 - Only for [Swift Package Manager](#swift-package-manager) and [Manual Install](#manual-install), add required frameworks and linker flags:
-    -  Go to **Build Phases** &#8594; **Link Binary With Libraries** and add the following system frameworks:
+    -  In Xcode, navigate to **Build Phases** &#8594; **Link Binary With Libraries** and add the following system frameworks:
         -  `UIKit`
         -  `Foundation`
         -  `CoreTelephony` (iOS only)
@@ -72,23 +75,25 @@ import ConvivaAppAnalytics
 ```
 
 #### Swift Package Manager
-
-Repository:
-`https://github.com/conviva/conviva-ios-appanalytics`
+- In Xcode, navigate to **File**  &#8594; **Add Package Dependency...**
+- Add the following repository URL to add the Package:
+    - `https://github.com/conviva/conviva-ios-appanalytics`
+     
     
 #### CocoaPods
-Add the following line to your `Podfile`:
+Add the following line to your `Podfile`, replacing `<version>` with the latest version: [![release](https://img.shields.io/github/release/Conviva/conviva-ios-appanalytics?label=Conviva%20iOS%20ECO%20SDK)](https://github.com/Conviva/conviva-ios-appanalytics/releases)
 ```plaintext
-pod 'ConvivaAppAnalytics', '1.0.3'
+pod 'ConvivaAppAnalytics', '<version>'
 ```
 
 #### Manual Install
-- Download the package from [releases](https://github.com/Conviva/conviva-ios-appanalytics/releases).
+- Download the package from [![release](https://img.shields.io/github/release/Conviva/conviva-ios-appanalytics?label=Conviva%20iOS%20ECO%20SDK)](https://github.com/Conviva/conviva-ios-appanalytics/releases).
 - In Xcode, go to **Build Phases** and add `ConvivaAppAnalytics.xcframework` to the **Link Binary with Libraries** section. This package contains frameworks for iOS, iPadOS and tvOS.
 
 ### 2. Initialization
 
-#### Note: It is recommended to initialize the tracker at the earliest possible stage of the application's launch lifecycle. Ideally, this should be done in the app's entry point method, before any other application functionality is executed.
+> [!NOTE]
+> It is recommended to initialize the tracker at the earliest possible stage of the application's launch lifecycle. Ideally, this should be done in the app's entry point method, before any other application functionality is executed.
 
 Some examples of Conviva iOS ECO SDK initialization:
 ```swift
@@ -107,6 +112,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         return true
     }
+
+}
 ```
 
 ```objective-c
@@ -263,6 +270,8 @@ class ExampleViewController: UIViewController {
     // Add below property in view controller
     @objc var catViewId: String = "Home Screen View"
 
+}
+
 ```
 ```objective-c
 // ObjC:
@@ -271,7 +280,9 @@ class ExampleViewController: UIViewController {
     // Declare property like 
     @property(copy, nonatomic)NSString *catViewId;
 
-
+@end
+```
+```objective-c
 // CustomViewController.m
 #import "ExampleViewController.h"
 
@@ -283,13 +294,38 @@ class ExampleViewController: UIViewController {
     self.catViewId = @"Home Screen View";
     // ...
 }
+
+@end
 ```
 
 </details>
 
 <details>
 
-   <summary><b>SwiftUI Support</b></summary>
+   <summary><b>SwiftUI Support For Button Clicks and Screen Views</b></summary>
+
+   For SwiftUI, `button_click` and `screen_view` events are not auto-collected and Conviva provide the extension functions. 
+
+   In SwiftUI applications, `button_click` and `screen_view` events are not auto-collected. To enable tracking for these events, Conviva provides extension functions: 
+
+   To track user taps or clicks:  
+   ```swift
+   Button("Submit") {
+       // action
+   }.convivaAnalyticsButtonClick(title: "Submit") 
+   ```
+
+   To track when a new screen or view is displayed:
+   ```swift
+   struct DetailView: View {
+      var body: some View {
+         VStack {
+            Text("Item Detail")
+         }
+         .convivaAnalyticsScreenView(name: "Detail Screen")
+     }
+  }
+   ```
    
    
 </details>
