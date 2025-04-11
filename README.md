@@ -302,7 +302,7 @@ class ExampleViewController: UIViewController {
 
 <details>
 
-   <summary><b>SwiftUI Support For Button Clicks and Screen Views</b></summary>
+   <summary><b>SwiftUI Support</b></summary>
 
    For SwiftUI, `button_click` and `screen_view` events are not auto-collected and Conviva provide the extension functions. 
 
@@ -377,7 +377,7 @@ To learn about the default metrics for analyzing the native and web applications
 
    <summary><b>screen_view, button_click</b></summary>
    
-   Auto-collection of `screen_view` and `button_click` is not supported for SwiftUI. To report `screen_view` and `button_click` in SwiftUI, please refer to [SwiftUI Support For Button Clicks and Screen Views](#swiftui-support-for-button-clicks-and-screen-views).
+   Auto-collection of `screen_view` and `button_click` is not supported for SwiftUI. To report `screen_view` and `button_click` in SwiftUI, please refer to [SwiftUI Support](#swiftui-support).
    
 </details>
 
