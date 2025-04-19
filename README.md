@@ -356,20 +356,22 @@ To learn about the default metrics for analyzing the native and web applications
 <details>
    
    <summary><b>network_request</b></summary>
-   
-   This feature supports `NSURLSession`, `NSURLConnection`, and third-party network libraries built on top of `NSURLSession` or `NSURLConnection`.
 
-  **Request and Response Body Collection:**
+1. This feature supports `NSURLSession`, `NSURLConnection`, and third-party network libraries built on top of `NSURLSession` or `NSURLConnection`.
 
-  Collected only when:
-  - Size is < 10KB and content-length is available.
-  - Content-type is `"json"` or `"text/plain"`.
-  - Data is a `NSDictionary`, nested `NSDictionary`, or `NSArray`.
+    **Request and Response Body Collection:**
 
- **Request and Response Header Collection:**
+   Collected only when:
+   - Size is < 10KB and content-length is available.
+   - Content-type is `"json"` or `"text/plain"`.
+   - Data is a `NSDictionary`, nested `NSDictionary`, or `NSArray`.
 
- Collected only when:
- - Data is a `NSDictionary` (Nested `NSDictionary` and `NSArray` are not yet supported).
+    **Request and Response Header Collection:**
+
+    Collected only when:
+    - Data is a `NSDictionary` (Nested `NSDictionary` and `NSArray` are not yet supported).
+
+2. Auto-collection of network requests made by the default `AVPlayer` implementation is **not supported**.
       
 </details>
 
